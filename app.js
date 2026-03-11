@@ -442,19 +442,7 @@ window.guardarHoras = async function() {
     alert("Ingrese al menos una hora");
     return;
   }
-
-  // Validar formato HH:MM:SS a. m./p. m.
-  const horaRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\s?(a\. m\.|p\. m\.)$/i;
-
-  if (nuevaHoraEntrada && !horaRegex.test(nuevaHoraEntrada)) {
-    alert("Formato de hora de entrada incorrecto. Ej: 10:16:41 p. m.");
-    return;
-  }
-
-  if (nuevaHoraSalida && !horaRegex.test(nuevaHoraSalida)) {
-    alert("Formato de hora de salida incorrecto. Ej: 05:30:12 p. m.");
-    return;
-  }
+ 
 
   const asistenciaRef = ref(db, "asistencias/" + id);
 
@@ -470,4 +458,5 @@ window.guardarHoras = async function() {
   modal.hide();
 
   filtrarAsistencias(); // refresca tabla con los nuevos datos
+
 };
