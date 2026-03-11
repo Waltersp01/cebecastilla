@@ -19,15 +19,20 @@
 
       <!-- Filtros -->
       <div class="row mb-3">
-        <div class="col-md-4">
-          <label>Filtrar por fecha</label>
+        <div class="col-md-3">
+          <label>Filtrar por fecha (día)</label>
           <input type="date" id="fechaFiltro" class="form-control">
         </div>
-        <div class="col-md-8 d-flex align-items-end gap-2">
+        <div class="col-md-3">
+          <label>Exportar planilla (mes)</label>
+          <input type="month" id="mesFiltroPDF" class="form-control">
+        </div>
+        <div class="col-md-6 d-flex align-items-end gap-2 flex-wrap">
           <button class="btn btn-primary" onclick="listarAsistencias()">Ver Todas</button>
           <button class="btn btn-success" onclick="mostrarAsistenciasHoy()">Asistencias de Hoy</button>
           <button class="btn btn-warning" onclick="filtrarAsistencias()">Filtrar</button>
           <a href="registrar.html" class="btn btn-warning">Gestion Personal</a>
+          <button class="btn btn-danger" onclick="exportarPlanillaPDF()">Exportar Planilla Mensual</button>
         </div>
       </div>
 
@@ -71,6 +76,8 @@
 
 <!-- Scripts necesarios -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 <script type="module" src="app.js"></script>
 
 </body>
