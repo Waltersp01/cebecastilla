@@ -442,6 +442,7 @@ window.guardarHoras = async function() {
     alert("Ingrese al menos una hora");
     return;
   }
+
  
 
   const asistenciaRef = ref(db, "asistencias/" + id);
@@ -458,5 +459,76 @@ window.guardarHoras = async function() {
   modal.hide();
 
   filtrarAsistencias(); // refresca tabla con los nuevos datos
+};
 
+window.exportarPlanillaPDF = async function() {
+  const fechaFiltro = document.getElementById("mesFiltroPDF").value; // usar mesFiltroPDF
+  if (!fechaFiltro) {
+    alert("Seleccione un mes (YYYY-MM) en el filtro)");
+    return;
+  }
+
+  const [anio, mes] = fechaFiltro.split("-");
+
+  const asistenciasRef = ref(db, "asistencias");
+  const snapshot = await get(asistenciasRef);
+
+  if (!snapshot.exists()) {
+    alert("No hay registros para este mes");
+    return;
+  }
+
+  const datos = snapshot.val();
+
+  // Crear objeto con personas y sus asistencias
+  const personas = {};
+  for (let id in datos) {
+    const d = datos[id];
+    if (d.fecha.startsWith(`${anio}-${mes}`)) { // Filtrar solo mes seleccionado
+      const nombre = d.nombre + " " + d.apellido;
+      if (!personas[nombre]) personas[nombre] = {};
+      const dia = new Date(d.fecha).getDate(); // Número del día
+      personas[nombre][dia] = "A"; // Marcar asistencia
+    }
+  }
+
+  const diasMes = new Date(anio, mes, 0).getDate(); // Días del mes
+  const columns = [{ header: "Nombre", dataKey: "nombre" }];
+  for (let d = 1; d <= diasMes; d++) columns.push({ header: d.toString(), dataKey: d.toString() });
+
+  const rows = [];
+  const hoy = new Date(); // Fecha actual
+  const mesActual = hoy.getMonth() + 1;
+  const anioActual = hoy.getFullYear();
+  const diaActual = hoy.getDate();
+
+  for (let nombre in personas) {
+    const fila = { nombre };
+    for (let d = 1; d <= diasMes; d++) {
+      // Si el día aún no pasó, dejar en blanco
+      if (anio > anioActual || (anio == anioActual && mes > mesActual) || (anio == anioActual && mes == mesActual && d > diaActual)) {
+        fila[d] = "";
+      } else {
+        fila[d] = personas[nombre][d] || "F"; // F si no asistió y ya pasó
+      }
+    }
+    rows.push(fila);
+  }
+
+  // Generar PDF
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+  doc.setFontSize(14);
+  doc.text(`Planilla de Asistencia - ${mes}/${anio}`, 14, 15);
+
+  doc.autoTable({
+    startY: 25,
+    head: [columns.map(c => c.header)],
+    body: rows.map(r => columns.map(c => r[c.dataKey])),
+    theme: "grid",
+    headStyles: { fillColor: [50, 50, 50], textColor: [255, 255, 255] },
+    styles: { fontSize: 8, cellPadding: 2 },
+  });
+
+  doc.save(`Planilla_Asistencia_${mes}_${anio}.pdf`);
 };
